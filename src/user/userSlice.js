@@ -1,38 +1,47 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-
-const states = {
-  list: [],
-  loading: false,
-  error: undefined,
-};
-
-export const fetcher = createAsyncThunk('users/fetch', async (_, { rejectWithValue }) => {
-  try {
-    return fetch('https://randomuser.me/api/?results=5').then((response) => response.json());
-  } catch (error) {
-    return rejectWithValue(error);
-  }
-});
+import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
 const usersSlice = createSlice({
   name: 'users',
-  initialState: states,
-  extraReducers: (builder) => {
-    builder.addCase(fetcher.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(fetcher.fulfilled, (state, action) => {
-      state.loading = false;
-      state.error = undefined;
-      state.list = action.payload.results;
-    });
-    builder.addCase(fetcher.rejected, (state, action) => {
-      if (action.error.name !== 'AbortError') {
-        state.loading = false;
-        state.error = action.error.name;
-      }
-    });
+  initialState: {
+    users: [],
+    isLoading: false,
+    error: undefined,
   },
+  reducers: {
+    // your reducers go here
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUsers.pending, (state) => {
+        state.isLoading = true;
+        state.error = undefined;
+      })
+      .addCase(fetchUsers.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.users = action.payload;
+      })
+      .addCase(fetchUsers.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message;
+      });
+  },
+  
 });
+
+
+
+export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
+  try {
+    const response = await fetch('https://randomuser.me/api/?results=10');
+    const data = await response.json();
+
+    return data.results;
+  } catch (error) {
+    throw new Error('Failed to fetch users.');
+  }
+});
+
+export const { actions, reducer } = usersSlice;
 
 export default usersSlice.reducer;

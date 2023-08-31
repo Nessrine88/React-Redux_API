@@ -1,13 +1,14 @@
+import React from 'react';
 import { Provider } from 'react-redux';
 import store from './store';
-import FetcherUsers from './components/fetchedUsers'
+import Users from './components/Users'
 
-function App() {
+const App = () => {
   return (
     <Provider store={store}>
-     <FetcherUsers />
+      <Users />
     </Provider>
   );
-}
+};
 
 export default App;
